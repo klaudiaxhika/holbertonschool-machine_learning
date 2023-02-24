@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-def cat_arrays(arr1, arr2):
-    return arr1 + arr2
+""" a function that returns concat arrays"""
 
-arr1 = [1, 2, 3, 4, 5]
-arr2 = [6, 7, 8]
-print(cat_arrays(arr1, arr2))
-print(arr1)
-print(arr2)
+
+def cat_arrays(arr1, arr2):
+    """returns concat arrays"""
+    return arr1 + arr2
