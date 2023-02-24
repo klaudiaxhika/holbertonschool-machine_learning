@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+"""imports numpy library"""
+
+
 import numpy as np
 
 """a function performs matrix multiplication"""
