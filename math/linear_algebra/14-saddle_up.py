@@ -3,6 +3,8 @@
 import numpy as np
 
 """a function performs matrix multiplication"""
+
+
 def np_matmul(mat1, mat2):
     """returns multiplied matrix"""
     return np.dot(mat1, mat2)
