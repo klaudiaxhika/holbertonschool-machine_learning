@@ -4,7 +4,7 @@
 
 def add_arrays(arr1, arr2):
     """returns sum of arrays"""
-    result=[]
+    result = []
     if len(arr1) != len(arr2):
         return None
     for i in range(len(arr1)):
