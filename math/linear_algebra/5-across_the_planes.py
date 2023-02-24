@@ -4,8 +4,8 @@
 
 def add_matrices2D(mat1, mat2):
     """returns sum  of a matrix"""
-    result=[]
-    if [len(mat1),len(mat1[0])] != [len(mat2),len(mat2[0])]:
+    result = []
+    if [len(mat1), len(mat1[0])] != [len(mat2), len(mat2[0])]:
         return None
     for i in range(len(mat1)):
         result.append([])
