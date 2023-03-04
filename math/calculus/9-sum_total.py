@@ -4,4 +4,5 @@
 
 def summation_i_squared(m):
     """returns squared sum"""
-    return int(m*(m+1)*(2*m+1)/6)
+    result = m*(m+1)*(2*m+1)/6
+    return int(result)
