@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""imports numpy"""
-
-
-import numpy as np
-""" a function that for sum"""
+""" a function for sum"""
 
 
 def summation_i_squared(m):
