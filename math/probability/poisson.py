@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """a class Poisson that represents a poisson distribution"""
 
+
 class Poisson:
     """
     a class Poisson that represents a poisson distribution:
@@ -15,5 +16,3 @@ class Poisson:
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
             self.lambtha = float(sum(data)) / len(data)
-
-
