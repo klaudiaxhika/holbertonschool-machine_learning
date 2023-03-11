@@ -18,17 +18,17 @@ class Poisson:
             self.lambtha = float(sum(data)) / len(data)
 
     def pmf(self, k):
-	"""
-	a class Poisson that represents a poisson distribution:
-	"""
-	if type(k) is not int:
-	    k = int(k)
-	if (k < 0):
-	    return 0
-	e = 2.7182818285
-	lambtha = self.lambtha
-	factorial = 1
-	for i in range(k):
-	    factorial *= (i + 1)
-	pmf = ((lambtha ** k) * (e** -lambtha)) / factorial
-	return pmf
+        """
+        a class Poisson that represents a poisson distribution:
+        """
+        if type(k) is not int:
+            k = int(k)
+        if (k < 0):
+            return 0
+        e = 2.7182818285
+        lambtha = self.lambtha
+        factorial = 1
+        for i in range(k):
+            factorial *= (i + 1)
+        pmf = ((lambtha ** k) * (e** -lambtha)) / factorial
+        return pmf
