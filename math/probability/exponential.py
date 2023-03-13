@@ -19,10 +19,8 @@ class Exponential:
 
     def pdf(self, x):
         """
-        a class Exponential that represents an exponential distribution
+        calculates pdf
         """
-        if type(x) is not int:
-            x = int(x)
         if (x < 0):
             return 0
         e = 2.7182818285
@@ -30,10 +28,11 @@ class Exponential:
         return pdf
 
     def cdf(self, x):
-        if type(x) is not int:
-            x = int(x)
+        """
+        calculates cdf
+        """
         if (x < 0):
             return 0
         e = 2.7182818285
-        cdf = float(1 - (e ** (-self.lambtha * x)))
+        cdf = 1 - (e ** (-self.lambtha * x))
         return cdf
