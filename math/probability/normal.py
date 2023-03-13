@@ -14,7 +14,7 @@ class Normal:
         if type(data) is not list:
             raise TypeError("data must be a list")
         if len(data) < 2:
-            raise ValueError("must contain multiple values")
+            raise ValueError("data must contain multiple values")
         if data is not None:
             self.mean = float(sum(data) / len(data))
             sumStddev = 0
