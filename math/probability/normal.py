@@ -45,6 +45,9 @@ class Normal:
         return y / (self.stddev * (2 * pi) ** (1/2))
 
     def erf(self, x):
+        """
+        calculates erf
+        """
         return (x - (x ** 3/3) + (x ** 5/10) - (x ** 7/42) + (x ** 9/216))
 
     def cdf(self, x):
