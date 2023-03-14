@@ -33,3 +33,10 @@ class Normal:
         calculates x-value
         """
         return float(z * self.stddev + self.mean)
+
+    def pdf(self, x):
+        e = 2.7182818285
+        pi = 3.1415926536
+        exponent = ((x - self.mean) ** 2) / (2 * (self.stddev) ** 2)
+        y = 1 / (e ** exponent)
+        return y / (self.stddev * (2 * pi) ** (1/2))
