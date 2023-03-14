@@ -26,12 +26,10 @@ class Normal:
         """
         calculates z-score
         """
-        self.zScore = float((x - self.mean) / self.stddev)
-        return self.zScore
+        return float((x - self.mean) / self.stddev)
 
-    def x_value(self, x):
+    def x_value(self, z):
         """
         calculates x-value
         """
-        self.xValue = float(self.zScore * self.stddev + self.mean)
-        return self.xValue
+        return float(z * self.stddev + self.mean)
