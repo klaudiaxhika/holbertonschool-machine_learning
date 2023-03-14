@@ -43,3 +43,13 @@ class Normal:
         exponent = ((x - self.mean) ** 2) / (2 * (self.stddev) ** 2)
         y = 1 / (e ** exponent)
         return y / (self.stddev * (2 * pi) ** (1/2))
+
+    def erf(self, x):
+        return (x - (x ** 3/3) + (x ** 5/10) - (x ** 7/42) + (x ** 9/216))
+
+    def cdf(self, x):
+        """
+        calculates the value of the CDF for a given x-value
+        """
+        y = ((x - self.mean) / (self.stddev * (2 ** (1/2))))
+        return (1/2) * (1 + self.erf(y))
