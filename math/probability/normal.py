@@ -35,6 +35,9 @@ class Normal:
         return float(z * self.stddev + self.mean)
 
     def pdf(self, x):
+        """
+        calculates pdf
+        """
         e = 2.7182818285
         pi = 3.1415926536
         exponent = ((x - self.mean) ** 2) / (2 * (self.stddev) ** 2)
