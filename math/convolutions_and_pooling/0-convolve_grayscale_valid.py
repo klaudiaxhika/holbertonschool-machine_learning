@@ -4,6 +4,7 @@
 
 import numpy as np
 
+
 """Performs a valid convolution on grayscale images"""
 
 
