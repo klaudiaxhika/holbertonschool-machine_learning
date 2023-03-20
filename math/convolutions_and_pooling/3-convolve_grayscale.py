@@ -24,8 +24,6 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
         
     ch = ((height + 2*ph - kh) // sh) + 1
     cw = ((width + 2*pw - kw) // sw) + 1
-    print(height,width)
-    print(ch,cw)
     img_padded = np.pad(images, ((0,0), (ph,ph), (pw,pw)), mode='constant')
     convoluted = np.zeros((m, ch, cw))
     
