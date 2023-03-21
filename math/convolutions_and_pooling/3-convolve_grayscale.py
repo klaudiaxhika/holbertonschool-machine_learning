@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
+"""Imports numpy"""
+
 import numpy as np
+"""Performs a same convolution on grayscale images"""
+
 
 def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     """
@@ -8,7 +12,6 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     m, height, width = images.shape
     kh, kw = kernel.shape
     sh, sw = stride
-
     if (padding == 'same'):
         if (kh % 2) == 1 and (kw % 2) == 1:
             ph = (kh - 1) // 2
@@ -21,13 +24,10 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
         pw = 0
     else:
         ph, pw = padding
-        
-        
     ch = ((height + 2*ph - kh) // sh) + 1
     cw = ((width + 2*pw - kw) // sw) + 1
-    img_padded = np.pad(images, ((0,0), (ph,ph), (pw,pw)), mode='constant')
+    img_padded = np.pad(images, ((0, 0), (ph, ph), (pw, pw)), mode='constant')
     convoluted = np.zeros((m, ch, cw))
-    
     i = 0
     for h in range(0, height + 2*ph - kh + 1, sh):
         j = 0
