@@ -27,7 +27,8 @@ def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
         ph, pw = padding
     ch = ((height + 2*ph - kh) // sh) + 1
     cw = ((width + 2*pw - kw) // sw) + 1
-    img_padded = np.pad(images, ((0, 0), (ph, ph), (pw, pw), (0, 0)), mode='constant')
+    img_padded = np.pad(images, ((0, 0), (ph, ph), (pw, pw), (0, 0)),
+                        mode='constant')
     convoluted = np.zeros((m, ch, cw))
     i = 0
     for h in range(0, height + 2*ph - kh + 1, sh):
