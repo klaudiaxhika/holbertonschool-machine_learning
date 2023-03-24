@@ -25,3 +25,19 @@ class MultiNormal:
         centered = data - self.mean
 
         self.cov = np.matmul(centered, centered.T) / (n - 1)
+
+    def pdf(self, x):
+        """
+        Calculate the probability density function (PDF)
+        """
+        if not isinstance(x, np.ndarray):
+            raise TypeError("x must be a numpy.ndarray")
+        if x.ndim != 2 or x.shape[1] != 1:
+            raise ValueError("x must have the shape ({d}, 1)")
+       
+        # Compute the PDF
+        d = self.mean.shape[0]
+        centered = x - self.mean
+        exponent = -0.5 * np.matmul(centered.T, np.matmul(np.linalg.inv(self.cov), centered))
+        norm_const = 1 / np.sqrt(((2 * np.pi) ** d) * np.linalg.det(self.cov))
+        return norm_const * np.exp(exponent)
