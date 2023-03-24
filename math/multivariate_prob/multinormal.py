@@ -9,7 +9,7 @@ class MultiNormal:
     """
     class that represents MultiNormal distribution
     """
-
+    
     def __init__(self, data):
         """
         Initialize a MultiNormal instance with the given data set
@@ -25,6 +25,7 @@ class MultiNormal:
         centered = data - self.mean
 
         self.cov = np.matmul(centered, centered.T) / (n - 1)
+
 
     def pdf(self, x):
         """
