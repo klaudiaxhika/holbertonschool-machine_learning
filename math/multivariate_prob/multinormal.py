@@ -34,7 +34,7 @@ class MultiNormal:
         if not isinstance(x, np.ndarray):
             raise TypeError("x must be a numpy.ndarray")
         if x.ndim != 2 or x.shape[1] != 1:
-            raise ValueError(f"x must have the shape ({self.mean.shape[0]}, 1)")
+            raise ValueError("x must have the shape ("+ str(self.mean.shape[0]) +", 1)")
 
         # Compute the PDF
         d = self.mean.shape[0]
