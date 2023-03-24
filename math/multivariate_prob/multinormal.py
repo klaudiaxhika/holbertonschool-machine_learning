@@ -6,6 +6,10 @@ import numpy as np
 
 
 class MultiNormal:
+    """
+    class that represents MultiNormal distribution
+    """
+
     def __init__(self, data):
         """
         Initialize a MultiNormal instance with the given data set
