@@ -30,13 +30,15 @@ class MultiNormal:
         """
         Calculate the probability density function (PDF)
         """
-        if not isinstance(x, np.ndarray):
+        if type(x) is not np.ndarray:
             raise TypeError("x must be a numpy.ndarray")
         if x.ndim != 2 or x.shape[1] != 1:
             raise ValueError("x must have the shape (" + str(self.mean.shape[0]) + ", 1)")
         else:
-            # Compute the PDF
-            D = np.sqrt(np.diag(C))
-            D_inverse = 1 / np. outer (D, D)
-            corr = D_inverse * C
-            return corr
+            d = self.cov. shape [0]
+            det = np.linalg.det(self.cov)
+            inv = np.linalg.inv (self.cov)
+            pdf = 1.0 / np.sqrt(((2 * np.pi)**d) * det)
+            mult = np.matmul(np.matmul((x - self.mean) .T, inv), (x - self.mean))
+            pdf *= np.exp(-0.5*mult)
+            return pdf
