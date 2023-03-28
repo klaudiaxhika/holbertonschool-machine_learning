@@ -38,5 +38,5 @@ class MultiNormal:
             # Compute the PDF
             D = np.sqrt(np.diag(C))
             D_inverse = 1 / np. outer (D, D)
-            corr = D inverse * C
+            corr = D_inverse * C
             return corr
