@@ -9,36 +9,32 @@ class MultiNormal:
     """
     class that represents MultiNormal distribution
     """
-
     def __init__(self, data):
-        """
-        Initialize a MultiNormal instance with the given data set
-        """
-        if not isinstance(data, np.ndarray) or data.ndim != 2:
+        if not isinstance(data, np.ndarray) or len(data.shape) != 2:
             raise TypeError("data must be a 2D numpy.ndarray")
-
-        n = data.shape[1]
+        n, d = data.shape
         if n < 2:
             raise ValueError("data must contain multiple data points")
-
-        self.mean = np.mean(data, axis=1, keepdims=True)
-        centered = data - self.mean
-
-        self.cov = np.matmul(centered, centered.T) / (n - 1)
-
+        self.mean, self.cov = mean_cov(data.T)
+        
     def pdf(self, x):
         """
-        Calculate the probability density function (PDF)
+        return teh pdf 
         """
         if type(x) is not np.ndarray:
             raise TypeError("x must be a numpy.ndarray")
-        if x.ndim != 2 or x.shape[1] != 1:
-            raise ValueError("x must have the shape (" + str(self.mean.shape[0]) + ", 1)")
-        else:
-            d = self.cov. shape [0]
-            det = np.linalg.det(self.cov)
-            inv = np.linalg.inv (self.cov)
-            pdf = 1.0 / np.sqrt(((2 * np.pi)**d) * det)
-            mult = np.matmul(np.matmul((x - self.mean) .T, inv), (x - self.mean))
-            pdf *= np.exp(-0.5*mult)
-            return pdf
+        d = self.cov.shape[0]
+        if len(x.shape) != 2:
+            raise ValueError("x must have the shape ({}, 1)".format(d))
+        
+        test_d, one = x.shape
+        if test_d != d or one != 1:
+            raise ValueError("x must have the shape ({}, 1)".format(d))
+        
+        det = np.linalg.det(self.cov)
+        inv = np.linalg.inv(self.cov)
+        pdf = 1.0 / np.sqrt(((2 * np.pi) ** d) * det)
+        mult = np.matmul(np.matmul((x - self.mean).T, inv), (x - self.mean))
+        pdf *= np.exp(-0.5 * mult)
+        pdf = pdf[0][0]
+        return pdf
