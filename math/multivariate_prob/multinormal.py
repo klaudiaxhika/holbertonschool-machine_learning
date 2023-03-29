@@ -9,17 +9,6 @@ class MultiNormal:
     """
     class that represents MultiNormal distribution
     """
-    def __init__(self, data):
-        """
-        return init
-        """
-        if not isinstance(data, np.ndarray) or len(data.shape) != 2:
-            raise TypeError("data must be a 2D numpy.ndarray")
-        n, d = data.shape
-        if n < 2:
-            raise ValueError("data must contain multiple data points")
-        self.mean, self.cov = mean_cov(data.T)
-        
     def mean_cov(X):
         """
         return mean cov
@@ -35,6 +24,18 @@ class MultiNormal:
             cov += np.outer((X[i] - mean), (X[i] - mean))
             cov /= (n - 1)
         return mean.reshape(1, d), cov
+
+    def __init__(self, data):
+        """
+        return init
+        """
+        if not isinstance(data, np.ndarray) or len(data.shape) != 2:
+            raise TypeError("data must be a 2D numpy.ndarray")
+        n, d = data.shape
+        if n < 2:
+            raise ValueError("data must contain multiple data points")
+        self.mean, self.cov = mean_cov(data.T)
+        
 
     def pdf(self, x):
         """
