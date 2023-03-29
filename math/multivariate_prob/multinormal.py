@@ -10,6 +10,9 @@ class MultiNormal:
     class that represents MultiNormal distribution
     """
     def __init__(self, data):
+        """
+        return init
+        """
         if not isinstance(data, np.ndarray) or len(data.shape) != 2:
             raise TypeError("data must be a 2D numpy.ndarray")
         n, d = data.shape
@@ -18,8 +21,8 @@ class MultiNormal:
         self.mean, self.cov = mean_cov(data.T)
         
     def mean_cov(X):
-                """
-        return the pdf 
+        """
+        return mean cov
         """
         if not isinstance(X, np.ndarray) or len(X.shape) != 2:
             raise TypeError("X must be a 2D numpy.ndarray")
