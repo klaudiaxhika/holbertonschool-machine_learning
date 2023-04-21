@@ -98,21 +98,26 @@ class DeepNeuralNetwork:
 
             # checks if the current layer is the output layer
             if index == self.L:
-                # the derivative of the cost with respect to the output activations A
+                # the derivative of the cost with respect
+                # to the output activations A
                 # is computed as A - Y
                 back["dz{}".format(index)] = (cache["A{}".format(index)] - Y)
             else:
-                # compute derivative w.r.t the activations of the previous layer
-                # retrieve  derivative w.r.t the activations of the current layer+1
+                # compute derivative w.r.t the activations
+                # of the previous layer
+                # retrieve  derivative w.r.t the activations
+                # of the current layer+1
                 dz_prev = back["dz{}".format(index + 1)]
                 # retrieve the activations of the current layer
                 A_current = cache["A{}".format(index)]
-                # compute the derivative of the cost with respect to the activations
+                # compute the derivative of the cost with
+                # respect to the activations
                 back["dz{}".format(index)] = (
                     np.matmul(W_prev.transpose(), dz_prev) *
                     (A_current * (1 - A_current)))
 
-            # compute the gradients of the weights and biases of a layer during backpropagation
+            # compute the gradients of the weights
+            # and biases of a layer during backpropagation
             # dz is the error of the current layer
             dz = back["dz{}".format(index)]
             # dW is the gradient of the weights
@@ -120,9 +125,7 @@ class DeepNeuralNetwork:
             # db is the gradient of the biases, along the m axis
             db = (1 / m) * np.sum(dz, axis=1, keepdims=True)
 
-
             W_prev = self.weights["W{}".format(index)]
-
             self.__weights["W{}".format(index)] = (
                 self.weights["W{}".format(index)] - (alpha * dW))
 
