@@ -2,6 +2,9 @@
 """Import numpy"""
 
 import numpy as np
+"""Import pickle"""
+
+import pickle
 """class that represents a deep neural network"""
 
 
