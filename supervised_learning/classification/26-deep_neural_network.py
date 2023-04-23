@@ -55,38 +55,44 @@ class DeepNeuralNetwork:
 
     def forward_prop(self, X):
         """
-        calculates forward propagation
+        forward propagation method for DeepNeuralNetwork class
+        :param X: numpy.ndarray of shape (nx, m), input data
+        :return: output of the neural network and the cache, respectively
         """
-        self.__cache["A0"] = X
+        self.cache['A0'] = X
+        for l in range(1, self.L):
+            self.cache['Z' + str(l)] = np.dot(self.weights['W' + str(l)], self.cache['A' + str(l - 1)]) + \
+                                       self.weights['b' + str(l)]
+            self.cache['A' + str(l)] = 1 / (1 + np.exp(-self.cache['Z' + str(l)]))
 
-        for index in range(self.L):
-            W = self.weights["W{}".format(index + 1)]
-            b = self.weights["b{}".format(index + 1)]
-
-            z = np.matmul(W, self.cache["A{}".format(index)]) + b
-            A = 1 / (1 + (np.exp(-z)))
-
-            self.__cache["A{}".format(index + 1)] = A
-
-        return (A, self.cache)
+        self.cache['Z' + str(self.L)] = np.dot(self.weights['W' + str(self.L)], self.cache['A' + str(self.L - 1)]) + \
+                                        self.weights['b' + str(self.L)]
+        self.cache['A' + str(self.L)] = np.exp(self.cache['Z' + str(self.L)]) / np.sum(np.exp(self.cache['Z' + str(self.L)]),
+                                                                                        axis=0)
+        return self.cache['A' + str(self.L)], self.cache
 
     def cost(self, Y, A):
         """
-        calculates cost
+        cost method for DeepNeuralNetwork class
+        :param Y: numpy.ndarray of shape (classes, m), one-hot labels
+        :param A: numpy.ndarray of shape (classes, m), probability output of the neural network
+        :return: cross-entropy cost
         """
-        m = Y.shape[1]
-        m_loss = np.sum((Y * np.log(A)) + ((1 - Y) * np.log(1.0000001 - A)))
-        cost = (1 / m) * (-(m_loss))
-        return (cost)
+        return -np.sum(Y * np.log(A))
 
     def evaluate(self, X, Y):
         """
-        calculates evaluation
+        evaluation method for DeepNeuralNetwork class
+        :param X: numpy.ndarray of shape (nx, m), input data
+        :param Y: numpy.ndarray of shape (classes, m), one-hot labels
+        :return: the neuron’s prediction and the cost of the network
         """
-        A, cache = self.forward_prop(X)
+        A, _ = self.forward_prop(X)
         cost = self.cost(Y, A)
-        prediction = np.where(A >= 0.5, 1, 0)
-        return (prediction, cost)
+        prediction = np.argmax(A, axis=0)
+        Y_hat = np.argmax(Y, axis=0)
+        accuracy = np.sum(prediction == Y_hat) / Y.shape[1]
+        return prediction, accuracy, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
