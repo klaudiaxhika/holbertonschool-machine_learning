@@ -3,10 +3,12 @@
 
 
 import numpy as np
-"""Calculates a f1 score"""
 
 
 def f1_score(confusion):
+    """
+    Calculates a f1 score
+    """
     sensitivity = __import__('1-sensitivity').sensitivity
     precision = __import__('2-precision').precision
     p = precision(confusion)
