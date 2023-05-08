@@ -3,10 +3,12 @@
 
 
 import numpy as np
-"""Calculates a confusion matrix"""
 
 
 def specificity(confusion):
+    """
+    Calculates a confusion matrix
+    """
     tp = np.diag(confusion)
     fp = np.sum(confusion, axis=0) - tp
     fn = np.sum(confusion, axis=1) - tp
