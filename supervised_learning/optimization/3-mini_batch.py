@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 """
-Imports numpy
-"""
-
-
-import numpy as np
-
-
-"""
 Imports tensorflow
 """
+
+
 import tensorflow as tf
 
 shuffle_data = __import__('2-shuffle_data').shuffle_data
