@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+"""Import numpy"""
 
-"""calculates a likelihood"""
+import numpy as np
+"""calculates a confusion matrix"""
 
 
 def create_confusion_matrix(labels, logits):
