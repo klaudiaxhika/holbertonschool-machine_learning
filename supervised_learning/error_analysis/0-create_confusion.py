@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Import numpy"""
+"""Imports numpy"""
+
 
 import numpy as np
-"""calculates a confusion matrix"""
+"""Calculates a confusion matrix"""
 
 
 def create_confusion_matrix(labels, logits):
