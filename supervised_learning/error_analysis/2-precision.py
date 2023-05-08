@@ -3,10 +3,12 @@
 
 
 import numpy as np
-"""Calculates a precision matrix"""
 
 
 def precision(confusion):
+    """
+    Calculates a precision matrix
+    """
     tp = np.diag(confusion)
     fp = np.sum(confusion, axis=0) - tp
 
