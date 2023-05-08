@@ -3,8 +3,10 @@
 
 
 import numpy as np
-"""Calculates a confusion matrix"""
 
 
 def create_confusion_matrix(labels, logits):
+    """
+    Returns a confusion matrix
+    """
     return np.matmul(labels.transpose(), logits)
