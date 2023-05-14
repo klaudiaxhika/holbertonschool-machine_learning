@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Imports tensorflow"""
+"""Imports numpy"""
 
 
-import tensorflow as tf
+import numpy as np
 
 
 def batch_norm(Z, gamma, beta, epsilon):
