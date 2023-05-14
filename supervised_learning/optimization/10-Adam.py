@@ -14,4 +14,5 @@ def create_Adam_op(loss, alpha, beta1, beta2, epsilon):
         beta_1=beta1, 
         beta_2=beta2, 
         epsilon=epsilon)
-    return optimizer
+    train_op = optimizer.minimize(loss)
+    return train_op
