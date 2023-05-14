@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Imports tensorflow"""
+"""Imports numpy"""
 
 
-import tensorflow as tf
+import numpy as np
 
 
 def learning_rate_decay(alpha, decay_rate, global_step, decay_step):
