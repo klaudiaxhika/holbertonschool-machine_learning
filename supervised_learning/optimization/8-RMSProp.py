@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""Imports tensorflow"""
+
+
 import tensorflow as tf
 
 def create_RMSProp_op(loss, alpha, beta2, epsilon):
