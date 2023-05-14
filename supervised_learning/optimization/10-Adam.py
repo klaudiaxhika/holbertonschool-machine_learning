@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Imports numpy"""
+"""Imports tensorflow"""
 
 
-import numpy as np
+import tensorflow as tf
 
 
 def create_Adam_op(loss, alpha, beta1, beta2, epsilon):
