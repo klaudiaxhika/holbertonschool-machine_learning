@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """early_stopping"""
 
+
 def early_stopping(cost, opt_cost, threshold, patience, count):
     """
     early_stopping
