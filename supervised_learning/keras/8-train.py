@@ -11,7 +11,7 @@ def train_model(network, data, labels, batch_size, epochs,
                 decay_rate=1, save_best=False, filepath=None,
                 verbose=True, shuffle=False):
     """trains model"""
-   
+
     callback = []
 
     if early_stopping and validation_data:
