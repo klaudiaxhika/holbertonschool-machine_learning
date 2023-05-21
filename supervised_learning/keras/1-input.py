@@ -15,6 +15,6 @@ def build_model(nx, layers, activations, lambtha, keep_prob):
         X = K.layers.Dense(layers[i],
                            activation=activations[i],
                            kernel_regularizer=reg_l2)(X)
-        
+
     model = K.Model(inputs=inputs, outputs=X)
     return model
