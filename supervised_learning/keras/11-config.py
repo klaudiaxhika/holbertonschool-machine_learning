@@ -17,4 +17,4 @@ def load_config(filename):
     with open(filename, 'r') as f:
         json_string = f.read()
     model = K.models.model_from_json(json_string)
-    return model#!/usr/bin/env python3
+    return model
