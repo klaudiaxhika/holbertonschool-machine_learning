@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""imports keras"""
 
 import tensorflow.keras as K
 
