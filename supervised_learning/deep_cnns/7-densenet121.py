@@ -41,7 +41,7 @@ def densenet121(growth_rate=32, compression=1.0):
                          padding='same',
                          strides=(2, 2),
                          kernel_initializer=init)(ReLUC0)
-    
+
     MP1 = K.layers.MaxPooling2D(pool_size=(3, 3),
                                 strides=(2, 2),
                                 padding='same')(C0)
