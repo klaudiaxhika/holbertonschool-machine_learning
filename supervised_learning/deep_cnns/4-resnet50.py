@@ -24,24 +24,24 @@ def resnet50():
     returns:
         the keras model
     """
-    
+
     init = K.initializers.he_normal()
     activation = K.activations.relu
     img_input = K.Input(shape=(224, 224, 3))
-    
+
     C0 = K.layers.Conv2D(filters=64,
                          kernel_size=(7, 7),
                          padding='same',
                          strides=(2, 2),
                          kernel_initializer=init)(img_input)
-    
+
     Batch_NormC0 = K.layers.BatchNormalization(axis=3)(C0)
     ReLUC0 = K.layers.Activation(activation)(Batch_NormC0)
-    
+
     MP1 = K.layers.MaxPooling2D(pool_size=(3, 3),
                                 strides=(2, 2),
                                 padding='same')(ReLUC0)
-    
+
     PB2 = projection_block(MP1, [64, 64, 256], s=1)
     IB3 = identity_block(PB2, [64, 64, 256])
     IB4 = identity_block(IB3, [64, 64, 256])
@@ -65,11 +65,11 @@ def resnet50():
     AP18 = K.layers.AveragePooling2D(pool_size=(7, 7),
                                      strides=(1, 1),
                                      padding='valid')(IB17)
-    
+
     output = K.layers.Dense(1000,
                             activation='softmax',
                             kernel_initializer=init)(AP18)
-    
+
     model = K.Model(inputs=img_input, outputs=output)
-    
+
     return model
