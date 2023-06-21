@@ -5,6 +5,7 @@ lenet5
 
 import tensorflow as tf
 
+
 def lenet5(x, y):
     """
     lenet5
