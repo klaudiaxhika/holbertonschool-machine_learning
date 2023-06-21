@@ -2,6 +2,7 @@
 import numpy as np
 import tensorflow.keras as keras
 
+
 class Yolo:
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
         self.model = keras.models.load_model(model_path)
@@ -18,5 +19,6 @@ class Yolo:
 
     def detect_objects(self, image):
         # Implement object detection using the YOLO v3 algorithm
-        # Return the detected objects with their bounding boxes, class labels, and confidence scores
+        # Return the detected objects with their bounding boxes, 
+        # class labels, and confidence scores
         pass
