@@ -29,34 +29,34 @@ class Yolo:
         box_class_probs = []
 
         for output in outputs:
-            grid_height, grid_width, anchor_boxes, _ = output.shape
-            num_classes = output.shape[-1] - 5
+            grid_height, grid_width, num_anchors, _ = output.shape
 
-            # Extract box coordinates, box confidences, and box class probabilities
-            box_coords = output[..., :4]
-            box_conf = output[..., 4:5]
-            box_probs = output[..., 5:]
+            # Extract box coordinates, confidences, and class probabilities
+            box = output[:, :, :, :4]
+            box_confidence = output[:, :, :, 4:5]
+            box_class_prob = output[:, :, :, 5:]
 
-            # Apply sigmoid function to box confidences and box class probabilities
-            box_conf = 1 / (1 + np.exp(-box_conf))
-            box_probs = 1 / (1 + np.exp(-box_probs))
+            # Reshape box coordinates to (grid_height, grid_width, num_anchors, 4)
+            box = box.reshape((grid_height, grid_width, num_anchors, 4))
 
-            # Scale box coordinates to the original image size
-            grid_height_ratio = image_size[0] / grid_height
-            grid_width_ratio = image_size[1] / grid_width
-            anchor_boxes = len(self.anchors)
+            # Calculate box coordinates relative to the original image size
+            box[..., 0:2] = sigmoid(box[..., 0:2]) + create_meshgrid(grid_width, grid_height, self.anchors)
+            box[..., 0:2] /= grid_width
+            box[..., 2:4] = np.exp(box[..., 2:4]) * self.anchors / self.model.input.shape[1].value
+            box[..., 2:4] /= image_size[::-1]
 
-            box_coords[..., 0] = (box_coords[..., 0] + self.sigmoid(box_coords[..., 0])) * grid_width_ratio
-            box_coords[..., 1] = (box_coords[..., 1] + self.sigmoid(box_coords[..., 1])) * grid_height_ratio
-            box_coords[..., 2] = self.anchors[:, 0] * np.exp(box_coords[..., 2]) * grid_width_ratio
-            box_coords[..., 3] = self.anchors[:, 1] * np.exp(box_coords[..., 3]) * grid_height_ratio
-
-            # Append processed outputs to respective lists
-            boxes.append(box_coords)
-            box_confidences.append(box_conf)
-            box_class_probs.append(box_probs)
+            # Append processed outputs to the respective lists
+            boxes.append(box)
+            box_confidences.append(box_confidence)
+            box_class_probs.append(box_class_prob)
 
         return boxes, box_confidences, box_class_probs
 
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
+def sigmoid(x):
+    return 1.0 / (1.0 + np.exp(-x))
+
+def create_meshgrid(width, height, anchors):
+    x = np.tile(np.arange(0, width), height)
+    y = np.repeat(np.arange(0, height), width)
+
+    return np.stack((x, y), axis=-1).reshape((1, height, width, 1, 2))
