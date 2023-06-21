@@ -6,6 +6,9 @@ class Yolo
 
 import numpy as np
 import tensorflow.keras as keras
+"""
+class Yolo
+"""
 
 
 class Yolo:
@@ -27,6 +30,6 @@ class Yolo:
 
     def detect_objects(self, image):
         # Implement object detection using the YOLO v3 algorithm
-        # Return the detected objects with their bounding boxes, 
+        # Return the detected objects with their bounding boxes,
         # class labels, and confidence scores
         pass
