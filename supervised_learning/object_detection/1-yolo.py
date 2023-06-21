@@ -29,27 +29,34 @@ class Yolo:
         box_class_probs = []
 
         for output in outputs:
-            grid_height, grid_width, num_boxes, _ = output.shape
+            grid_height, grid_width, anchor_boxes, _ = output.shape
+            num_classes = output.shape[-1] - 5
 
-            # Process boundary boxes
-            box = output[..., :4]
-            box[..., 0:2] = 1 / (1 + np.exp(-box[..., 0:2]))
-            box[..., 2:4] = np.exp(box[..., 2:4]) * self.anchors / self.model.input.shape[1:3]
+            # Extract box coordinates, box confidences, and box class probabilities
+            box_coords = output[..., :4]
+            box_conf = output[..., 4:5]
+            box_probs = output[..., 5:]
 
-            # Adjust boundary box coordinates relative to original image size
-            image_height, image_width = image_size
-            box[..., 0:1] *= image_width
-            box[..., 1:2] *= image_height
-            box[..., 2:3] *= image_width
-            box[..., 3:4] *= image_height
+            # Apply sigmoid function to box confidences and box class probabilities
+            box_conf = 1 / (1 + np.exp(-box_conf))
+            box_probs = 1 / (1 + np.exp(-box_probs))
 
-            boxes.append(box)
+            # Scale box coordinates to the original image size
+            grid_height_ratio = image_size[0] / grid_height
+            grid_width_ratio = image_size[1] / grid_width
+            anchor_boxes = len(self.anchors)
 
-            # Extract box confidences and class probabilities
-            box_confidence = output[..., 4:5]
-            box_confidences.append(box_confidence)
+            box_coords[..., 0] = (box_coords[..., 0] + self.sigmoid(box_coords[..., 0])) * grid_width_ratio
+            box_coords[..., 1] = (box_coords[..., 1] + self.sigmoid(box_coords[..., 1])) * grid_height_ratio
+            box_coords[..., 2] = self.anchors[:, 0] * np.exp(box_coords[..., 2]) * grid_width_ratio
+            box_coords[..., 3] = self.anchors[:, 1] * np.exp(box_coords[..., 3]) * grid_height_ratio
 
-            class_probs = output[..., 5:]
-            box_class_probs.append(class_probs)
+            # Append processed outputs to respective lists
+            boxes.append(box_coords)
+            box_confidences.append(box_conf)
+            box_class_probs.append(box_probs)
 
         return boxes, box_confidences, box_class_probs
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
