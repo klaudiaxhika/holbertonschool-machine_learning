@@ -6,7 +6,7 @@ pool_backward
 import numpy as np
 
 
-def pool_backward(dA, A_prev, kernel_shape, stride=(1, 1), mode='max'):  
+def pool_backward(dA, A_prev, kernel_shape, stride=(1, 1), mode='max'):
     """
     pool_backward
     """
