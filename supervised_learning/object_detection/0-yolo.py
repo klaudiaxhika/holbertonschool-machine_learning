@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
+"""
+class Yolo
+"""
+
+
 import numpy as np
 import tensorflow.keras as keras
 
 
 class Yolo:
+    """
+    class Yolo
+    """
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
         self.model = keras.models.load_model(model_path)
         self.class_names = self.load_class_names(classes_path)
