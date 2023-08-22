@@ -20,9 +20,11 @@ def ngram_bleu(references, sentence, n):
     for ngram, count in sentence_ngrams.items():
         total_precision += min(count, reference_ngrams.get(ngram, 0))
     
-    # Calculate BLEU score
+    # Calculate BLEU score components
     brevity_penalty = min(1.0, len(sentence) / max(sum(len(ref) for ref in references), 1))
     precision = total_precision / max(len(sentence), 1)
+    
+    # Calculate BLEU score (with geometric mean)
     bleu_score = brevity_penalty * (precision ** (1/n))
     
     return bleu_score
