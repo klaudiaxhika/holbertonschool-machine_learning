@@ -9,6 +9,6 @@ def bag_of_words(sentences, vocab=None):
     
     vectorizer = CountVectorizer(vocabulary=vocab)
     embeddings = vectorizer.transform(sentences).toarray()
-    features = vectorizer.get_feature_names_out()
+    features = vectorizer.get_feature_names()
     
     return embeddings, features
