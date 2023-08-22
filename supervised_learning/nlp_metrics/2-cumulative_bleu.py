@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import math
 
+import math
+
 def ngram_precision(candidate_ngrams, reference_ngrams):
     count = sum(min(candidate_ngrams.get(ngram, 0), reference_ngrams.get(ngram, 0)) for ngram in candidate_ngrams)
     total = sum(candidate_ngrams.values())
@@ -25,8 +27,10 @@ def cumulative_bleu(references, sentence, n):
         precision = ngram_precision(candidate_ngrams, reference_ngrams)
         precisions.append(precision)
     
+    non_zero_precisions = [p if p != 0 else 1e-10 for p in precisions]
     brevity_penalty = min(1.0, len(sentence) / max(sum(len(ref) for ref in references), 1))
-    geometric_mean = math.exp(sum(map(math.log, precisions)) / n)
+    geometric_mean = math.exp(sum(map(math.log, non_zero_precisions)) / n)
     cumulative_bleu_score = brevity_penalty * geometric_mean
     
     return cumulative_bleu_score
+
