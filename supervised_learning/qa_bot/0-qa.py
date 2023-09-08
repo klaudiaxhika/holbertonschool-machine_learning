@@ -1,41 +1,45 @@
 #!/usr/bin/env python3
 
+import tensorflow as tf
 import tensorflow_hub as hub
 from transformers import BertTokenizer
 
 def question_answer(question, reference):
+    """
+    Finds a snippet of text within a reference document to answer a question
+    """
     # Load the BERT tokenizer
-    tokenizer = BertTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
-    
+    tokenizer = BertTokenizer.from_pretrained(
+        'bert-large-uncased-whole-word-masking-finetuned-squad')
+
     # Load the BERT model from TensorFlow Hub
-    model = hub.load("https://tfhub.dev/google/bert_uncased_L-24_H-1024_A-16/4")
-    
-    # Tokenize the question and reference text
-    question_tokens = tokenizer.tokenize(question)
-    reference_tokens = tokenizer.tokenize(reference)
-    
-    # Combine question and reference tokens with [SEP] token in between
-    input_tokens = ["[CLS]"] + question_tokens + ["[SEP]"] + reference_tokens + ["[SEP]"]
-    
-    # Convert tokens to token IDs
-    input_ids = tokenizer.convert_tokens_to_ids(input_tokens)
-    
-    # Get answer span using BERT model
-    inputs = {
-        "input_word_ids": tf.constant([input_ids]),
-        "input_type_ids": tf.constant([0] * len(question_tokens) + [1] * len(reference_tokens) + [1]),
-        "input_mask": tf.constant([1] * len(input_tokens))
-    }
-    outputs = model(inputs)
-    start_logits = outputs["start_logits"].numpy()[0]
-    end_logits = outputs["end_logits"].numpy()[0]
-    
-    # Find the start and end indices of the answer span
-    start_idx = np.argmax(start_logits)
-    end_idx = np.argmax(end_logits[start_idx:]) + start_idx
-    
-    # Get the answer span from the reference text
-    answer_tokens = input_tokens[start_idx:end_idx + 1]
+    model = hub.load("https://tfhub.dev/see--/bert-uncased-tf2-qa/1")
+
+    quest_tokens = tokenizer.tokenize(question)
+    refer_tokens = tokenizer.tokenize(reference)
+
+    tokens = ['[CLS]'] + quest_tokens + ['[SEP]'] + refer_tokens + ['[SEP]']
+
+    #convert tokens to id
+    input_words_id = tokenizer.convert_tokens_to_ids(tokens)
+    input_mask = [1] * len(input_words_id)
+    input_type_ids = [0] * (1 + len(quest_tokens) + 1) + [1] * (len(refer_tokens) + 1)
+
+    input_words_id, input_mask, input_type_ids = map(
+      lambda t: tf.expand_dims(
+          tf.convert_to_tensor(t, dtype=tf.int32), 0),
+      (input_words_id, input_mask, input_type_ids)
+      )
+
+    outputs = model([input_words_id, input_mask, input_type_ids])
+
+    short_start = tf.argmax(outputs[0][0][1:]) + 1
+    short_end = tf.argmax(outputs[1][0][1:]) + 1
+    answer_tokens = tokens[short_start: short_end + 1]
+
     answer = tokenizer.convert_tokens_to_string(answer_tokens)
-    
+    if answer == None or answer == "" or question in answer:
+        return None
+
     return answer
+
