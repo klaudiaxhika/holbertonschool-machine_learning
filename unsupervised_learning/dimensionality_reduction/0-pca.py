@@ -22,6 +22,5 @@ def pca(X, var=0.95):
     top_eigenvectors = eigenvectors[:, :num_components]
 
     weights_matrix = top_eigenvectors
-    
-    return weights_matrix
 
+    return weights_matrix
