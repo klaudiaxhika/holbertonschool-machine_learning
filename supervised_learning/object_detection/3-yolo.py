@@ -1,126 +1,185 @@
 #!/usr/bin/env python3
-"""
-Defines class Yolo that uses the Yolo v3 algorithm to perform object detection
-"""
-import tensorflow.keras as K
+"""Task 3. NMS added to 2-yolo.py"""
+from tensorflow.keras.models import load_model
 import numpy as np
 
 
 class Yolo:
-    """
-    Class that uses Yolo v3 algorithm to perform object detection
+    """Uses You only look once (YOLO)v3 to perform object detection
+    Args:
+        model_path: path to where a Darknet Keras model is stored
+        classes_path: path to where the list of class names used for the
+            Darknet model, listed in order of index, can be found
+        class_t: float representing the box score threshold for the
+            initial filtering step
+        nms_t: float representing the IOU threshold for non-max
+            suppression
+        anchors: numpy.ndarray of shape (outputs, anchor_boxes, 2)
+            containing all of the anchor boxes:
+            outputs: is the number of outputs (predictions) made by the
+                Darknet model
+            anchor_boxes: is the number of anchor boxes used for each
+                prediction
+            2 => [anchor_box_width, anchor_box_height]
     """
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
-        """
-        Yolo class constructor
-        parameters:
-            model_path: the path to where a Darknet Keras model is stored
-            classes_path: the path to where the list of class names
-                used for the Darknet model can be found
-            class_t: represents the box score threshold for
-                the initial filtering step
-            nms_t: represents the IOU threshold for non-max suppression
-            anchors: contains all the anchor boxes
-        """
-        self.model = K.models.load_model(model_path)
-        with open(classes_path, 'r') as f:
-            lines = f.readlines()
-            self.class_names = []
-            for name in lines:
-                self.class_names.append(name[:-1])
+        self.model = load_model(model_path)
+        with open(classes_path) as f:
+            self.class_names = [line.strip() for line in f]
         self.class_t = class_t
         self.nms_t = nms_t
         self.anchors = anchors
 
-    @staticmethod
-    def sigmoid(x):
-        """
-        Returns the output after passing through Sigmoid function
-        output will be between 0 and 1
-        """
-        return (1. / (1. + np.exp(-x)))
-
     def process_outputs(self, outputs, image_size):
-        """
-        Processes the outputs
+        """Process Darknet model outputs
+        Args:
+            outputs: list of numpy.ndarrays containing the predictions from
+                the Darknet model for a single image:
+                Each output will have the shape (grid_height, grid_width,
+                    anchor_boxes, 4 + 1 + classes)
+                    grid_height & grid_width => the height and width of the
+                        grid used for the output
+                    anchor_boxes => the number of anchor boxes used
+                    4 => (t_x, t_y, t_w, t_h)
+                    1 => box_confidence
+                    classes => class probabilities for all classes
+            image_size: numpy.ndarray containing the image’s original size
+                [image_height, image_width]
+        Returns:
+            A tuple of (boxes, box_confidences, box_class_probs):
+                boxes: a list of numpy.ndarrays of shape (grid_height,
+                    grid_width, anchor_boxes, 4) containing the processed
+                    boundary boxes for each output, respectively:
+                    4 => (x1, y1, x2, y2)
+                        (x1, y1, x2, y2) should represent the boundary box
+                        relative to original image
+                box_confidences: list of numpy.ndarrays of shape (grid_height,
+                    grid_width, anchor_boxes, 1) containing the box confidences
+                    for each output, respectively
+                box_class_probs: list of numpy.ndarrays of shape (grid_height,
+                    grid_width, anchor_boxes, classes) containing the box’s
+                    class probabilities for each output, respectively
         """
         boxes = []
         box_confidences = []
         box_class_probs = []
-        for i, output in enumerate(outputs):
-            anchors = self.anchors[i]
-            grid_height, grid_width = output.shape[:2]
-
-            t_xy = output[..., :2]
-            t_wh = output[..., 2:4]
-
-            sigmoid_conf = self.sigmoid(output[..., 4])
-            sigmoid_prob = self.sigmoid(output[..., 5:])
-
-            box_conf = np.expand_dims(sigmoid_conf, axis=-1)
-            box_class_prob = sigmoid_prob
-
-            box_confidences.append(box_conf)
-            box_class_probs.append(box_class_prob)
-
-            b_wh = anchors * np.exp(t_wh)
-            b_wh /= self.model.inputs[0].shape.as_list()[1:3]
-
-            grid = np.tile(np.indices((grid_width, grid_height)).T,
-                           anchors.shape[0]).reshape(
-                               (grid_height, grid_width) + anchors.shape)
-
-            b_xy = (self.sigmoid(t_xy) + grid) / [grid_width, grid_height]
-
-            b_xy1 = b_xy - (b_wh / 2)
-            b_xy2 = b_xy + (b_wh / 2)
-            box = np.concatenate((b_xy1, b_xy2), axis=-1)
-            box *= np.tile(np.flip(image_size, axis=0), 2)
-
-            boxes.append(box)
+        for i in range(len(outputs)):
+            boxes.append(outputs[i][..., :4])
+            box_confidences.append(1 / (1 + np.exp(-outputs[i][..., 4:5])))
+            box_class_probs.append(1 / (1 + np.exp(-outputs[i][..., 5:])))
+        image_height, image_width = image_size
+        for i in range(len(boxes)):
+            grid_width = outputs[i].shape[1]
+            grid_height = outputs[i].shape[0]
+            anchor_boxes = outputs[i].shape[2]
+            for cy in range(grid_height):
+                for cx in range(grid_width):
+                    for b in range(anchor_boxes):
+                        tx, ty, tw, th = boxes[i][cy, cx, b]
+                        pw, ph = self.anchors[i][b]
+                        bx = (1 / (1 + np.exp(-tx))) + cx
+                        by = (1 / (1 + np.exp(-ty))) + cy
+                        bw = pw * np.exp(tw)
+                        bh = ph * np.exp(th)
+                        bx /= grid_width
+                        by /= grid_height
+                        bw /= self.model.input.shape[1]
+                        bh /= self.model.input.shape[2]
+                        x1 = (bx - (bw / 2)) * image_width
+                        y1 = (by - (bh / 2)) * image_height
+                        x2 = (bx + (bw / 2)) * image_width
+                        y2 = (by + (bh / 2)) * image_height
+                        boxes[i][cy, cx, b] = [x1, y1, x2, y2]
         return (boxes, box_confidences, box_class_probs)
 
     def filter_boxes(self, boxes, box_confidences, box_class_probs):
-        """
-        Determines filtered bounding boxes from processed outputs
-        """
-        filtered_boxes = []
-        box_classes = []
-        box_scores = []
-
-        for i, b in enumerate(boxes):
-            box_conf = box_confidences[i]
-            box_class_prob = box_class_probs[i]
-
-            box_score = box_conf * box_class_prob
-
-            box_class = np.argmax(box_score, axis=-1)
-            box_class_score = np.max(box_score, axis=-1)
-
-            index = np.where(box_class_score >= self.class_t)
-
-            filtered_boxes.append(b[index])
-            box_classes.append(box_class[index])
-            box_scores.append(box_class_score[index])
-
-        filtered_boxes = np.concatenate(filtered_boxes)
-        box_classes = np.concatenate(box_classes)
-        box_scores = np.concatenate(box_scores)
+        """Removes the boxes with low box scores
+        Args:
+            boxes: list of numpy.ndarrays of shape (grid_height, grid_width,
+                anchor_boxes, 4) containing the processed boundary boxes for
+                each output, respectively
+            box_confidences: list of numpy.ndarrays of shape (grid_height,
+                grid_width, anchor_boxes, 1) containing the processed box
+                confidences for each output, respectively
+            box_class_probs: list of numpy.ndarrays of shape (grid_height,
+                grid_width, anchor_boxes, classes) containing the processed
+                box class probabilities for each output, respectively
+        Returns:
+            A tuple of (filtered_boxes, box_classes, box_scores):
+                filtered_boxes: a numpy.ndarray of shape (?, 4) containing all
+                    of the filtered bounding boxes:
+                box_classes: a numpy.ndarray of shape (?,) containing the class
+                    number that each box in filtered_boxes predicts
+                box_scores: a numpy.ndarray of shape (?) containing the box
+                    scores"""
+        filtered_boxes, box_classes, box_scores = None, [], []
+        for i in range(len(boxes)):
+            cur_box_score = box_confidences[i] * box_class_probs[i]
+            cur_box_class = np.argmax(cur_box_score, axis=-1)
+            cur_box_score = np.max(cur_box_score, axis=-1)
+            mask = cur_box_score >= self.class_t
+            if filtered_boxes is None:
+                filtered_boxes = boxes[i][mask]
+                box_scores = cur_box_score[mask]
+                box_classes = cur_box_class[mask]
+            else:
+                filtered_boxes = np.concatenate((filtered_boxes,
+                                                boxes[i][mask]),
+                                                axis=0)
+                box_classes = np.concatenate((box_classes,
+                                              cur_box_class[mask]),
+                                             axis=0)
+                box_scores = np.concatenate((box_scores,
+                                             cur_box_score[mask]),
+                                            axis=0)
         return (filtered_boxes, box_classes, box_scores)
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
-        """
-        Suppresses all non-max filter boxes to return predicted bounding box
-        """
+        """Performs non-max suppression"""
         box_predictions = []
         predicted_box_classes = []
         predicted_box_scores = []
 
-        for i, b in enumerate(filtered_boxes):
-            box_class = box_classes[i]
-            box_score = box_scores[i]
+        for c in set(box_classes):
+            idxs = np.where(box_classes == c)
+            class_boxes = filtered_boxes[idxs]
+            class_box_scores = box_scores[idxs]
 
-            index = np.where(box_score >= self.nms_t)
+            while len(class_boxes) > 0:
+                max_idx = np.argmax(class_box_scores)
+                box_predictions.append(class_boxes[max_idx])
+                predicted_box_classes.append(c)
+                predicted_box_scores.append(class_box_scores[max_idx])
 
-            box_predictions.append(b[index])
-            predicted_box_classes.append()
+                class_boxes = np.delete(class_boxes, max_idx, axis=0)
+                class_box_scores = np.delete(class_box_scores, max_idx, axis=0)
+
+                if len(class_boxes) == 0:
+                    break
+
+                iou = self.intersection_over_union(box_predictions[-1],
+                                                   class_boxes)
+                iou_mask = iou < self.nms_t
+
+                class_boxes = class_boxes[iou_mask]
+                class_box_scores = class_box_scores[iou_mask]
+
+        return (np.array(box_predictions),
+                np.array(predicted_box_classes),
+                np.array(predicted_box_scores))
+
+    def intersection_over_union(self, box1, boxes):
+        """Calculates the intersection over union of two sets of boxes"""
+        x1 = np.maximum(box1[0], boxes[:, 0])
+        y1 = np.maximum(box1[1], boxes[:, 1])
+        x2 = np.minimum(box1[2], boxes[:, 2])
+        y2 = np.minimum(box1[3], boxes[:, 3])
+
+        intersection_area = np.maximum(x2 - x1, 0) * np.maximum(y2 - y1, 0)
+
+        box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
+        boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+
+        union_area = box1_area + boxes_area - intersection_area
+
+        return intersection_area / union_area
