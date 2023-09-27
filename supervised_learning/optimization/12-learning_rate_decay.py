@@ -3,7 +3,7 @@
 A functon that creates a learning rate decay operation in tensorflow
 using inverse time decay
 """
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 def learning_rate_decay(alpha, decay_rate, global_step, decay_step):
