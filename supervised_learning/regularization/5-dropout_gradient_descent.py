@@ -5,23 +5,44 @@ regularization using gradient descent
 """
 import numpy as np
 
-
 def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
-    """
-    A function that upates the weights of a neural network with Dropout
-    regularization using gradient descent"""
-    A2 = cache["A{}".format(L)]
-    dz = A2 - Y
-    for i in range(L, 0, -1):
-        db = (np.sum(dz, axis=1, keepdims=True) / Y.shape[1])
-        dw = (np.matmul(cache["A{}".format(i - 1)], dz.T) / Y.shape[1])
-        if (i - 1) > 0:
-            dz = np.matmul(weights["W{}".format(
-                i)].T, dz) * (1 - cache["A{}".format(i - 1)]
-                              * cache["A{}".format(i - 1)])
-            dz = dz * cache["D{}".format(i - 1)]
-            dz = dz / keep_prob
-        weights["b{}".format(i)] = weights["b{}".format(
-            i)] - (alpha * db)
-        weights["W{}".format(i)] = weights["W{}".format(
-            i)] - (alpha * dw).T
+     """
+     A function that calculates the cost of a neural network
+     with l2 regularization"""
+    m = Y.shape[1]
+    back = {}
+
+    for index in range(L, 0, -1):
+        A = cache["A{}".format(index - 1)]
+        if index == L:
+            # if last layer, calculate dz value as A - Y
+            back["dz{}".format(index)] = (cache["A{}".format(index)] - Y)
+            dz = back["dz{}".format(index)]
+
+        else:
+            # retreive previous dz and current activation
+            dz_prev = back["dz{}".format(index + 1)]
+            A_current = cache["A{}".format(index)]
+
+            # calculate current dz
+            back["dz{}".format(index)] = (
+                np.matmul(W_prev.transpose(), dz_prev) *
+                (A_current * (1 - A_current)))
+
+            # multiply by dropout mask and divide by keep probability
+            dz = back["dz{}".format(index)]
+            dz *= cache["D{}".format(index)]
+            dz /= keep_prob
+
+        # calculate weights and bias
+        dW = (1 / m) * (np.matmul(dz, A.transpose()))
+        db = (1 / m) * np.sum(dz, axis=1, keepdims=True)
+
+        # store for next interation
+        W_prev = weights["W{}".format(index)]
+
+        # modify weights and bias
+        weights["W{}".format(index)] = (
+            weights["W{}".format(index)] - (alpha * dW))
+        weights["b{}".format(index)] = (
+            weights["b{}".format(index)] - (alpha * db))
