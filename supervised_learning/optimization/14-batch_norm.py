@@ -1,24 +1,19 @@
 #!/usr/bin/env python3
-"""Imports tensorflow"""
-
-
+"""
+A function that creates a batch normalization layer for a neural network
+in tensorflow
+"""
 import tensorflow as tf
 
 
 def create_batch_norm_layer(prev, n, activation):
-    """
-    create_batch_norm_layer
-    """
-    k_init = tf.keras.initializers.VarianceScaling(mode="fan_avg")
-    dense_layer = tf.keras.layers.Dense(units=n, kernel_initializer=k_init, use_bias=False)
-    Z = dense_layer(prev)
-
-    beta = tf.Variable(initial_value=tf.zeros((1, n)), trainable=True)
-    gamma = tf.Variable(initial_value=tf.ones((1, n)), trainable=True)
-    epsilon = 1e-8
-
-    mean, variance = tf.nn.moments(Z, axes=0, keepdims=True)
-    Z_norm = (Z - mean) / tf.sqrt(variance + epsilon)
-    Z_tilde = gamma * Z_norm + beta
-
-    return activation(Z_tilde)
+    """Batch normalization upgraded"""
+    W = tf.contrib.layers.variance_scaling_initializer(mode="FAN_AVG")
+    model = tf.layers.Dense(units=n, name="layer", kernel_initializer=W)
+    X = model(prev)
+    beta = tf.Variable(tf.constant(0.0, shape=[n]), trainable=True)
+    gamma = tf.Variable(tf.constant(1.0, shape=[n]), trainable=True)
+    mean, variance = tf.nn.moments(X, [0])
+    norm = tf.nn.batch_normalization(X, mean, variance, offset=beta,
+                                     scale=gamma, variance_epsilon=1e-8)
+    return activation(norm)
