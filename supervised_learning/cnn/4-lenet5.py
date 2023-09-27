@@ -1,51 +1,40 @@
 #!/usr/bin/env python3
 """A function that builds a modified version
 of the LeNet-5 architecture using tensorflow"""
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 
 def lenet5(x, y):
-    """A function that builds a modified version of the
-    LeNet-5 architecture using tensorflow"""
-    weights_initializer = tf.contrib.layers.variance_scaling_initializer()
-    C1 = tf.layers.Conv2D(filters=6,
-                          kernel_size=(5, 5),
-                          padding='same',
-                          activation=tf.nn.relu,
-                          kernel_initializer=weights_initializer)
-    output_1 = C1(x)
-    P2 = tf.layers.MaxPooling2D(pool_size=(2, 2),
-                                strides=(2, 2))
-    output_2 = P2(output_1)
-    C3 = tf.layers.Conv2D(filters=16,
-                          kernel_size=(5, 5),
-                          padding='valid',
-                          activation=tf.nn.relu,
-                          kernel_initializer=weights_initializer)
-    output_3 = C3(output_2)
-    P4 = tf.layers.MaxPooling2D(pool_size=(2, 2),
-                                strides=(2, 2))
-    output_4 = P4(output_3)
-    output_42 = tf.layers.Flatten()(output_4)
-    F5 = tf.layers.Dense(
-        120,
-        activation=tf.nn.relu,
-        kernel_initializer=weights_initializer)
-    output_5 = F5(output_42)
-    F6 = tf.layers.Dense(
-        84,
-        activation=tf.nn.relu,
-        kernel_initializer=weights_initializer)
-    output_6 = F6(output_5)
-    F7 = tf.layers.Dense(
-        10,
-        kernel_initializer=weights_initializer)
-    output_7 = F7(output_6)
-    softmax = tf.nn.softmax(output_7)
-    loss = tf.losses.softmax_cross_entropy(y, logits=output_7)
-    op = tf.train.AdamOptimizer().minimize(loss)
-    y_pred = tf.math.argmax(output_7, axis=1)
-    y_out = tf.math.argmax(y, axis=1)
-    equality = tf.math.equal(y_pred, y_out)
-    accuracy = tf.reduce_mean(tf.cast(equality, 'float'))
-    return softmax, op, loss, accuracy
+    # Convolutional layer 1
+    conv1 = tf.keras.layers.Conv2D(filters=6, kernel_size=5, padding='same', activation='relu', kernel_initializer='he_normal')(x)
+    # Max pooling layer 1
+    pool1 = tf.keras.layers.MaxPooling2D(pool_size=2, strides=2)(conv1)
+
+    # Convolutional layer 2
+    conv2 = tf.keras.layers.Conv2D(filters=16, kernel_size=5, padding='valid', activation='relu', kernel_initializer='he_normal')(pool1)
+    # Max pooling layer 2
+    pool2 = tf.keras.layers.MaxPooling2D(pool_size=2, strides=2)(conv2)
+
+    # Flatten the output from the previous layer
+    flatten = tf.keras.layers.Flatten()(pool2)
+
+    # Fully connected layer 1
+    fc1 = tf.keras.layers.Dense(120, activation='relu', kernel_initializer='he_normal')(flatten)
+
+    # Fully connected layer 2
+    fc2 = tf.keras.layers.Dense(84, activation='relu', kernel_initializer='he_normal')(fc1)
+
+    # Output layer
+    output = tf.keras.layers.Dense(10, activation='softmax')(fc2)
+
+    # Define the loss function
+    loss = tf.reduce_mean(tf.keras.losses.categorical_crossentropy(y, output))
+
+    # Define the accuracy metric
+    accuracy = tf.reduce_mean(tf.keras.metrics.categorical_accuracy(y, output))
+
+    # Define the optimizer and training operation
+    optimizer = tf.keras.optimizers.Adam()
+    train_op = optimizer.minimize(loss)
+
+    return output, train_op, loss, accuracy
