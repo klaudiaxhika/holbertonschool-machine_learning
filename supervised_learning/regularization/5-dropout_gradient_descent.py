@@ -5,6 +5,7 @@ regularization using gradient descent
 """
 import numpy as np
 
+
 def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
     """
     A function that calculates the cost of a neural network
