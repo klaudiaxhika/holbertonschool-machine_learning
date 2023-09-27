@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""
+Script to train a convolutional neural network to classify the CIFAR 10 dataset
+"""
+
+import tensorflow.keras as K
+
+
+def preprocess_data(X, Y):
+    """
+    Pre-processes the data for the model
+    """
+    X_p = K.applications.densenet.preprocess_input(X, data_format="channels_last")
+    Y_p = K.utils.to_categorical(Y, 10)
+    return (X_p, Y_p)
+
+
+if __name__ == '__main__':
+    """
+    Trains a convolutional neural network to classify CIFAR 10 dataset
+    Saves model to cifar10.h5
+    """
+    (X_train, Y_train), (X_test, Y_test) = K.datasets.cifar10.load_data()
+    X_train, Y_train = preprocess_data(X_train, Y_train)
+    X_test, Y_test = preprocess_data(X_test, Y_test)
+
+    inputs = K.Input(shape=(32, 32, 3))
+    inputs_resized = K.layers.Lambda(
+        lambda x: K.backend.resize_images(x,
+                                          height_factor=(224 // 32),
+                                          width_factor=(224 // 32),
+                                          data_format="channels_last"))(inputs)
+
+    DenseNet121 = K.applications.DenseNet121(include_top=False,
+                                             weights='imagenet',
+                                             input_shape=(224, 224, 3))
+    activation = K.activations.relu
+
+    X = DenseNet121(inputs_resized, training=False)
+    X = K.layers.Flatten()(X)
+    X = K.layers.Dense(500, activation=activation)(X)
+    X = K.layers.Dropout(0.2)(X)
+    outputs = K.layers.Dense(10, activation='softmax')(X)
+
+    model = K.Model(inputs=inputs, outputs=outputs)
+
+    DenseNet121.trainable = False
+
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=K.optimizers.Adam(),
+                  metrics=['accuracy'])
+
+    early_stopping = K.callbacks.EarlyStopping(patience=3, restore_best_weights=True)
+
+    history = model.fit(x=X_train, y=Y_train,
+                        validation_data=(X_test, Y_test),
+                        batch_size=300,
+                        epochs=15,  # Specify the maximum number of epochs
+                        callbacks=[early_stopping],  # Add the EarlyStopping callback
+                        verbose=True)
+
+    model.save('cifar10.h5')
