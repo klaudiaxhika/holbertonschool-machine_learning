@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-
-import numpy as np
+"""
+Creates a TF-IDF embedding
+"""
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+
 def tf_idf(sentences, vocab=None):
-    if vocab is None:
-        vocab = set(word for sentence in sentences for word in sentence.split())
-    
-    vectorizer = TfidfVectorizer(vocabulary=vocab)
-    embeddings = vectorizer.fit_transform(sentences).toarray()
-    features = vectorizer.get_feature_names()
-    
+    """
+    Creates a TF-IDF embedding
+    sentences: a list of sentences to analyze
+    vocab: a list of the vocabulary words to use for the analysis
+        If None, all words within sentences should be used
+    """
+    tfidf = TfidfVectorizer(vocabulary=vocab)
+    X = tfidf.fit_transform(sentences)
+    features = tfidf.get_feature_names()
+    embeddings = X.toarray()
+
     return embeddings, features

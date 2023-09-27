@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
-
-import numpy as np
+"""
+Creates a bag of words embedding matrix
+"""
 from sklearn.feature_extraction.text import CountVectorizer
 
+
 def bag_of_words(sentences, vocab=None):
-    if vocab is None:
-        vocab = set(word for sentence in sentences for word in sentence.split())
-    
-    vectorizer = CountVectorizer(vocabulary=vocab)
-    embeddings = vectorizer.transform(sentences).toarray()
-    features = vectorizer.get_feature_names()
-    
+    """
+    Creates a bag of words embedding matrix
+    sentences: a list of sentences to analyze
+    vocab: a list of the vocabulary words to use for the analysis
+    """
+    vector = CountVectorizer(vocabulary=vocab)
+    X = vector.fit_transform(sentences)
+    features = vector.get_feature_names()
+    embeddings = X.toarray()
+
     return embeddings, features
