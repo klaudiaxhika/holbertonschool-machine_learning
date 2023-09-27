@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-
+"""A function that updates the function def train_model:
+to also train the model using early stopping"""
 import tensorflow.keras as K
 
 
 def train_model(network, data, labels, batch_size, epochs,
                 validation_data=None, early_stopping=False,
                 patience=0, verbose=True, shuffle=False):
-    """trains model"""
+    """A function that updates the function def train_model
+    to also train the model using early stopping"""
     if early_stopping and validation_data:
         callback = []
         callback.append(
