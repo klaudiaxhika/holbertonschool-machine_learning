@@ -1,56 +1,73 @@
 #!/usr/bin/env python3
 """
-yolo class
+Defines class Yolo that uses the Yolo v3 algorithm to perform object detection
 """
-
+import tensorflow.keras as K
 import numpy as np
-import tensorflow.keras as keras
+
 
 class Yolo:
+    """
+    Class that uses Yolo v3 algorithm to perform object detection
+    """
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
-        self.model = keras.models.load_model(model_path)
-        self.class_names = self.load_class_names(classes_path)
+        """
+        Yolo class constructor
+        """
+        self.model = K.models.load_model(model_path)
+        with open(classes_path, 'r') as f:
+            lines = f.readlines()
+            self.class_names = []
+            for name in lines:
+                self.class_names.append(name[:-1])
         self.class_t = class_t
         self.nms_t = nms_t
         self.anchors = anchors
 
-    def load_class_names(self, file_path):
-        with open(file_path, 'r') as file:
-            class_names = file.readlines()
-        class_names = [name.strip() for name in class_names]
-        return class_names
+    @staticmethod
+    def sigmoid(x):
+        """
+        Returns the output after passing through Sigmoid function
+        output will be between 0 and 1
+        """
+        return (1. / (1. + np.exp(-x)))
 
     def process_outputs(self, outputs, image_size):
+        """
+        The function that processes the outputs
+        """
         boxes = []
         box_confidences = []
         box_class_probs = []
-    
-        for output in outputs:
-            grid_height, grid_width, num_anchors, _ = output.shape
-    
-            # Reshape the output predictions
-            output = output.reshape(
-                (grid_height, grid_width, num_anchors, 4 + 1 + self.num_classes)
-            )
-    
-            # Extract bounding box coordinates
-            box = output[..., :4]
-            box[..., :2] = self.sigmoid(box[..., :2])
-            box[..., 2:] = np.exp(box[..., 2:]) * self.anchors / np.array([grid_width, grid_height])
-            box[..., 0] = (box[..., 0] + np.arange(grid_width).reshape(1, -1, 1)) / grid_width * image_size[1]
-            box[..., 1] = (box[..., 1] + np.arange(grid_height).reshape(-1, 1, 1)) / grid_height * image_size[0]
-            box[..., 2] = (box[..., 2] ** 2) * image_size[1]
-            box[..., 3] = (box[..., 3] ** 2) * image_size[0]
-    
-            # Extract confidence scores and class probabilities
-            box_confidence = self.sigmoid(output[..., 4:5])
-            class_probs = self.sigmoid(output[..., 5:])
-    
-            boxes.append(box)
-            box_confidences.append(box_confidence)
-            box_class_probs.append(class_probs)
-    
-        return boxes, box_confidences, box_class_probs
+        for i, output in enumerate(outputs):
+            anchors = self.anchors[i]
+            grid_height, grid_width = output.shape[:2]
 
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
+            t_xy = output[..., :2]
+            t_wh = output[..., 2:4]
+
+            sigmoid_conf = self.sigmoid(output[..., 4])
+            sigmoid_prob = self.sigmoid(output[..., 5:])
+
+            box_conf = np.expand_dims(sigmoid_conf, axis=-1)
+            box_class_prob = sigmoid_prob
+
+            box_confidences.append(box_conf)
+            box_class_probs.append(box_class_prob)
+
+            b_wh = anchors * np.exp(t_wh)
+            b_wh /= self.model.inputs[0].shape.as_list()[1:3]
+
+            grid = np.tile(np.indices((grid_width, grid_height)).T,
+                           anchors.shape[0]).reshape(
+                               (grid_height, grid_width) + anchors.shape)
+
+            b_xy = (self.sigmoid(t_xy) + grid) / [grid_width, grid_height]
+
+            b_xy1 = b_xy - (b_wh / 2)
+            b_xy2 = b_xy + (b_wh / 2)
+            box = np.concatenate((b_xy1, b_xy2), axis=-1)
+            box *= np.tile(np.flip(image_size, axis=0), 2)
+
+            boxes.append(box)
+        return (boxes, box_confidences, box_class_probs)

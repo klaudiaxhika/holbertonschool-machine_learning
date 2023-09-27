@@ -9,12 +9,6 @@ import numpy as np
 class Yolo:
     """
     Class that uses Yolo v3 algorithm to perform object detection
-    public instance attributes:
-        model: the Darknet Keras model
-        class_names: list of all the class names for the model
-        class_t: the box score threshold for the initial filtering step
-        nms_t: the IOU threshold for non-max suppression
-        anchors: the anchor boxes
     """
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
         """
@@ -26,7 +20,7 @@ class Yolo:
             class_t: represents the box score threshold for
                 the initial filtering step
             nms_t: represents the IOU threshold for non-max suppression
-            anchors :contains all the anchor boxes
+            anchors: contains all the anchor boxes
         """
         self.model = K.models.load_model(model_path)
         with open(classes_path, 'r') as f:
@@ -113,3 +107,20 @@ class Yolo:
         box_classes = np.concatenate(box_classes)
         box_scores = np.concatenate(box_scores)
         return (filtered_boxes, box_classes, box_scores)
+
+    def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
+        """
+        Suppresses all non-max filter boxes to return predicted bounding box
+        """
+        box_predictions = []
+        predicted_box_classes = []
+        predicted_box_scores = []
+
+        for i, b in enumerate(filtered_boxes):
+            box_class = box_classes[i]
+            box_score = box_scores[i]
+
+            index = np.where(box_score >= self.nms_t)
+
+            box_predictions.append(b[index])
+            predicted_box_classes.append()
