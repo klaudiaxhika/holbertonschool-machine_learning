@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Function that builds, trains, and saves a neural networ"""
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 
 
