@@ -4,7 +4,7 @@ Evaluate the output of the neural network classifier
 """
 
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 def evaluate(X, Y, save_path):
