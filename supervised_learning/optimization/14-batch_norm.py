@@ -3,7 +3,7 @@
 A function that creates a batch normalization layer for a neural network
 in tensorflow
 """
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 def create_batch_norm_layer(prev, n, activation):
