@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import sklearn as sklearn
 """
 Creates a bag of words embedding matrix
 """
