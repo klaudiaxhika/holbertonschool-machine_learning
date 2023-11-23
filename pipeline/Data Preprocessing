@@ -1,0 +1,72 @@
+# Data Processing Plan for Portfolio Project
+
+## Data Sources
+- Describing what sources have I gotten my data from, and how I obtained them.For example:
+
+> I have collected data from two sources: the **World Bank Open Data** and the **Global Terrorism Database**. The World Bank Open Data provides various indicators of economic development, such as GDP, population, life expectancy, etc. The Global Terrorism Database contains information on terrorist attacks around the world, such as location, date, target, weapon, casualties, etc. I downloaded the data sets from their respective websites in CSV format.
+
+## Data Format
+- Describing in what format is the data currently, and what format will I transform my data to. For example:
+
+> The data sets are currently in CSV format, with each row representing an observation and each column representing a variable. I will transform the data to a pandas DataFrame in Python, which is a convenient data structure for data analysis and manipulation. I will also save the DataFrame as a pickle file, which is a binary format that preserves the data types and index labels of the DataFrame.
+
+## Data Features
+- Describing what features are currently included in the data, and what kinds of data exploration will I perform. For example:
+
+> The World Bank data set has 62 columns, including the country name, the country code, the indicator name, the indicator code, and the values for each year from 1960 to 2020. The Global Terrorism Database has 135 columns, including the event ID, the year, the month, the day, the country, the region, the city, the latitude, the longitude, the attack type, the target type, the weapon type, the number of killed, the number of wounded, etc. I will perform some data exploration to understand the distribution, correlation, and trends of the variables, such as:
+> - Plotting histograms and boxplots to see the distribution of numerical variables, such as GDP, population, life expectancy, number of killed, number of wounded, etc.
+> - Plotting bar charts and pie charts to see the frequency of categorical variables, such as country, region, attack type, target type, weapon type, etc.
+> - Plotting scatter plots and heatmaps to see the correlation between numerical variables, such as GDP and life expectancy, number of killed and number of wounded, etc.
+> - Plotting line charts and area charts to see the trends of numerical variables over time, such as GDP growth, population growth, terrorism incidents, etc.
+
+## Data Hypotheses
+- Describing if I have any preexisting hypotheses about the data, and how will I test these hypotheses. For example:
+
+> I have some hypotheses about the data, such as:
+> - There is a positive correlation between GDP and life expectancy, meaning that countries with higher GDP tend to have longer life spans.
+> - There is a negative correlation between GDP and terrorism incidents, meaning that countries with lower GDP tend to have more terrorism attacks.
+> - There is a positive correlation between terrorism incidents and casualties, meaning that more terrorism attacks result in more deaths and injuries.
+> I will test these hypotheses by performing statistical tests, such as Pearson's correlation coefficient, t-test, ANOVA, etc. I will also visualize the results using plots, such as scatter plots, line charts, etc.
+
+## Data Quality
+- Describing if the data is sparse or dense, and how will I handle missing data or outliers. For example:
+
+> The data is sparse, meaning that there are many missing values and zeros in the data sets. For example, the World Bank data set has many missing values for some indicators and some countries, especially in the earlier years. The Global Terrorism Database has many zeros for some variables, such as number of killed and number of wounded, because not all attacks result in casualties. I will handle missing data and outliers by applying different strategies, such as:
+> - Dropping rows or columns with too many missing values or zeros, if they are not relevant for the analysis.
+> - Imputing missing values or zeros with mean, median, mode, or other methods, if they are relevant for the analysis.
+> - Detecting and removing outliers using methods such as z-score, IQR, or isolation forest, if they are not representative of the data.
+
+## Data Splitting
+- Describe how will I split the data into training/validation/testing sets. For example:
+
+> I will split the data into three sets: training, validation, and testing. The training set will be used to train the model, the validation set will be used to tune the model parameters, and the testing set will be used to evaluate the model performance. I will use a 70/15/15 split, meaning that 70% of the data will be allocated to the training set, 15% to the validation set, and 15% to the testing set. I will also ensure that the data is stratified, meaning that the proportion of each class or category is preserved in each set.
+
+## Data Bias
+- Describing how will I ensure that your dataset is unbiased. For example:
+
+> I will ensure that my dataset is unbiased by checking and addressing the following issues:
+> - Sampling bias, which occurs when the data is not representative of the population of interest. I will avoid this by using a random sampling method, or a stratified sampling method if the population is heterogeneous.
+> - Measurement bias, which occurs when the data is not collected or recorded accurately. I will avoid this by using reliable and valid data sources, and by cleaning and validating the data before analysis.
+> - Confounding bias, which occurs when the data is influenced by other variables that are not accounted for. I will avoid this by controlling for confounding variables, or by using methods such as regression, matching, or propensity score to adjust for them.
+
+## Data Features for Model
+- Describing what features do I currently think will be included in the training of my model. For example:
+
+> I currently think that the following features will be included in the training of my model:
+> - GDP per capita, which is the total GDP divided by the population. This is a measure of the economic development and standard of living of a country.
+> - Life expectancy at birth, which is the average number of years that a newborn can expect to live. This is a measure of the health and well-being of a country.
+> - Terrorism incidents, which is the number of terrorist attacks that occurred in a country in a given year. This is a measure of the security and stability of a country.
+> - Terrorism casualties, which is the number of deaths and injuries that resulted from terrorist attacks in a country in a given year. This is a measure of the impact and severity of terrorism in a country.
+
+## Data Types
+- Describing what types of data will I be handling, and how will I transform this data for your model. For example:
+
+> I will be handling both categorical and numerical data. Categorical data are data that have a finite number of possible values, such as country, region, attack type, target type, weapon type, etc. Numerical data are data that have a continuous range of possible values, such as GDP, population, life expectancy, number of killed, number of wounded, etc. I will transform this data for my model by applying the following steps:
+> - Encoding categorical data into numerical data, using methods such as one-hot encoding, label encoding, or ordinal encoding, depending on the nature and order of the categories.
+> - Scaling numerical data to a common range, using methods such as min-max scaling, standardization, or normalization, depending on the distribution and scale of the data.
+> - Reducing the dimensionality of the data, using methods such as principal component analysis, linear discriminant analysis, or feature selection, depending on the number and relevance of the features.
+
+## Data Storage
+- Describing where and how will I store this data. For example:
+
+> I will store this data in a cloud-based platform, such as Google Drive, Dropbox, or AWS S3. This will allow me to access the data from anywhere, and to share the data with others easily. I will also store the data in different formats, such as CSV, pickle, or HDF5, depending on the size and structure of the data. I will also use a version control system, such as Git or GitHub, to track the changes and updates of the data. This will help me to maintain the quality and consistency of the data.
